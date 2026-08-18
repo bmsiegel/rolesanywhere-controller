@@ -1,0 +1,62 @@
+ignore:
+  resource_names:
+    - Subject
+    - Crl
+
+resources:
+  TrustAnchor:
+    renames:
+      operations:
+        CreateTrustAnchor:
+          input_fields:
+            Name: Name
+        UpdateTrustAnchor:
+          input_fields:
+            TrustAnchorId: TrustAnchorID
+    fields:
+      Source.SourceData.AcmPcaArn:
+        references:
+          resource: CertificateAuthority
+          service_name: acmpca
+          path: Status.ACKResourceMetadata.ARN
+      Enabled:
+        late_initialize: {}
+    exceptions:
+      terminal_codes:
+        - ResourceNotFoundException
+        - ValidationException
+        - AccessDeniedException
+    hooks:
+      sdk_update_post_build_request:
+        template_path: hooks/trust_anchor/sdk_update_post_build_request.go.tpl
+      sdk_delete_pre_build_request:
+        template_path: hooks/trust_anchor/sdk_delete_pre_build_request.go.tpl
+
+  Profile:
+    renames:
+      operations:
+        CreateProfile:
+          input_fields:
+            Name: Name
+        UpdateProfile:
+          input_fields:
+            ProfileId: ProfileID
+    fields:
+      RoleArns:
+        references:
+          resource: Role
+          service_name: iam
+          path: Status.ACKResourceMetadata.ARN
+      Enabled:
+        late_initialize: {}
+    exceptions:
+      terminal_codes:
+        - ResourceNotFoundException
+        - ValidationException
+        - AccessDeniedException
+    hooks:
+      sdk_update_post_build_request:
+        template_path: hooks/profile/sdk_update_post_build_request.go.tpl
+      sdk_delete_pre_build_request:
+        template_path: hooks/profile/sdk_delete_pre_build_request.go.tpl
+

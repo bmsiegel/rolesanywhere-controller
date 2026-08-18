@@ -1,0 +1,17 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-rolesanywhere-reader
+  namespace: default
+rules:
+- apiGroups:
+  - rolesanywhere.services.k8s.aws
+  resources:
+  - profiles
+  - trustanchors
+  verbs:
+  - get
+  - list
+  - watch

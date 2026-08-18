@@ -1,0 +1,172 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  name: crls.rolesanywhere.services.k8s.aws
+spec:
+  group: rolesanywhere.services.k8s.aws
+  names:
+    categories:
+    - ack
+    - aws
+    kind: CRL
+    listKind: CRLList
+    plural: crls
+    shortNames:
+    - crl
+    singular: crl
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.crlARN
+      name: ARN
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="ACK.ResourceSynced")].status
+      name: Synced
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: CRLSpec defines the desired state of a CRL (Certificate Revocation
+              List).
+            properties:
+              crlData:
+                description: Base64-encoded CRL data.
+                type: string
+              enabled:
+                type: boolean
+              name:
+                type: string
+              tags:
+                items:
+                  description: Tag represents an AWS resource tag.
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+              trustAnchorArn:
+                description: ARN of the trust anchor to associate this CRL with.
+                type: string
+              trustAnchorArnRef:
+                description: Reference to a TrustAnchor resource.
+                properties:
+                  from:
+                    properties:
+                      name:
+                        type: string
+                    type: object
+                type: object
+            required:
+            - crlData
+            - name
+            type: object
+          status:
+            description: CRLStatus defines the observed state of a CRL.
+            properties:
+              ackResourceMetadata:
+                description: |-
+                  ResourceMetadata is common to all custom resources (CRs) managed by an ACK
+                  service controller. It is contained in the CR's `Status` member field and
+                  comprises various status and identifier fields useful to ACK for tracking
+                  state changes between Kubernetes and the backend AWS service API
+                properties:
+                  arn:
+                    description: |-
+                      ARN is the Amazon Resource Name for the resource. This is a
+                      globally-unique identifier and is set only by the ACK service controller
+                      once the controller has orchestrated the creation of the resource OR
+                      when it has verified that an "adopted" resource (a resource where the
+                      ARN annotation was set by the Kubernetes user on the CR) exists and
+                      matches the supplied CR's Spec field values.
+                      https://github.com/aws/aws-controllers-k8s/issues/270
+                    type: string
+                  ownerAccountID:
+                    description: |-
+                      OwnerAccountID is the AWS Account ID of the account that owns the
+                      backend AWS service API resource.
+                    type: string
+                  partition:
+                    description: Partition is the AWS partition in which the resource
+                      exists or will exist
+                    type: string
+                  region:
+                    description: Region is the AWS region in which the resource exists
+                      or will exist.
+                    type: string
+                required:
+                - ownerAccountID
+                - region
+                type: object
+              conditions:
+                items:
+                  description: |-
+                    Condition is the common struct used by all CRDs managed by ACK service
+                    controllers to indicate terminal states  of the CR and its backend AWS
+                    service API resource
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type is the type of the Condition
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              createdAt:
+                format: date-time
+                type: string
+              crlARN:
+                type: string
+              crlID:
+                type: string
+              updatedAt:
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

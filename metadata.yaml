@@ -1,0 +1,8 @@
+service:
+  full_name: "AWS IAM Roles Anywhere"
+  short_name: "RolesAnywhere"
+  link: "https://aws.amazon.com/iam/roles-anywhere/"
+  documentation: "https://docs.aws.amazon.com/rolesanywhere/latest/APIReference/Welcome.html"
+api_versions:
+  - api_version: v1alpha1
+    status: planned

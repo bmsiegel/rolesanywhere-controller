@@ -1,0 +1,206 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: trustanchors.rolesanywhere.services.k8s.aws
+spec:
+  group: rolesanywhere.services.k8s.aws
+  names:
+    kind: TrustAnchor
+    listKind: TrustAnchorList
+    plural: trustanchors
+    singular: trustanchor
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: TrustAnchor is the Schema for the TrustAnchors API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: TrustAnchorSpec defines the desired state of TrustAnchor.
+            properties:
+              enabled:
+                description: Specifies whether the trust anchor is enabled.
+                type: boolean
+              name:
+                description: |-
+                  The name of the trust anchor.
+
+                  Regex Pattern: `^[ a-zA-Z0-9-_]*$`
+                type: string
+              notificationSettings:
+                description: A list of notification settings to be associated to the
+                  trust anchor.
+                items:
+                  description: |-
+                    Customizable notification settings that will be applied to notification events.
+                    IAM Roles Anywhere consumes these settings while notifying across multiple
+                    channels - CloudWatch metrics, EventBridge, and Health Dashboard.
+                  properties:
+                    channel:
+                      type: string
+                    enabled:
+                      type: boolean
+                    event:
+                      type: string
+                    threshold:
+                      format: int64
+                      type: integer
+                  type: object
+                type: array
+              source:
+                description: The trust anchor type and its related certificate data.
+                properties:
+                  sourceData:
+                    description: The data field of the trust anchor depending on its
+                      type.
+                    properties:
+                      acmPCAARN:
+                        type: string
+                      acmPCARef:
+                        description: Reference field for ACMPCAARN
+                        properties:
+                          from:
+                            description: |-
+                              AWSResourceReference provides all the values necessary to reference another
+                              k8s resource for finding the identifier(Id/ARN/Name)
+                            properties:
+                              name:
+                                type: string
+                              namespace:
+                                type: string
+                            type: object
+                        type: object
+                      x509CertificateData:
+                        type: string
+                    type: object
+                  sourceType:
+                    type: string
+                type: object
+              tags:
+                description: The tags to attach to the trust anchor.
+                items:
+                  description: A label that consists of a key and value you define.
+                  properties:
+                    key:
+                      type: string
+                    value:
+                      type: string
+                  type: object
+                type: array
+            required:
+            - name
+            - source
+            type: object
+          status:
+            description: TrustAnchorStatus defines the observed state of TrustAnchor
+            properties:
+              ackResourceMetadata:
+                description: |-
+                  All CRs managed by ACK have a common `Status.ACKResourceMetadata` member
+                  that is used to contain resource sync state, account ownership,
+                  constructed ARN for the resource
+                properties:
+                  arn:
+                    description: |-
+                      ARN is the Amazon Resource Name for the resource. This is a
+                      globally-unique identifier and is set only by the ACK service controller
+                      once the controller has orchestrated the creation of the resource OR
+                      when it has verified that an "adopted" resource (a resource where the
+                      ARN annotation was set by the Kubernetes user on the CR) exists and
+                      matches the supplied CR's Spec field values.
+                      https://github.com/aws/aws-controllers-k8s/issues/270
+                    type: string
+                  ownerAccountID:
+                    description: |-
+                      OwnerAccountID is the AWS Account ID of the account that owns the
+                      backend AWS service API resource.
+                    type: string
+                  partition:
+                    description: Partition is the AWS partition in which the resource
+                      exists or will exist
+                    type: string
+                  region:
+                    description: Region is the AWS region in which the resource exists
+                      or will exist.
+                    type: string
+                required:
+                - ownerAccountID
+                - region
+                type: object
+              conditions:
+                description: |-
+                  All CRs managed by ACK have a common `Status.Conditions` member that
+                  contains a collection of `ackv1alpha1.Condition` objects that describe
+                  the various terminal states of the CR and its backend AWS service API
+                  resource
+                items:
+                  description: |-
+                    Condition is the common struct used by all CRDs managed by ACK service
+                    controllers to indicate terminal states  of the CR and its backend AWS
+                    service API resource
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type is the type of the Condition
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              createdAt:
+                description: The ISO-8601 timestamp when the trust anchor was created.
+                format: date-time
+                type: string
+              trustAnchorID:
+                description: |-
+                  The unique identifier of the trust anchor.
+
+                  Regex Pattern: `[a-f0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}`
+                type: string
+              updatedAt:
+                description: The ISO-8601 timestamp when the trust anchor was last
+                  updated.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

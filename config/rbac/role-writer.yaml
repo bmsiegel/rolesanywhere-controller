@@ -1,0 +1,30 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: ack-rolesanywhere-writer
+  namespace: default
+rules:
+- apiGroups:
+  - rolesanywhere.services.k8s.aws
+  resources:
+  - profiles
+  - trustanchors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rolesanywhere.services.k8s.aws
+  resources:
+  - profiles
+  - trustanchors
+  verbs:
+  - get
+  - patch
+  - update
